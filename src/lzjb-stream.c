@@ -13,13 +13,15 @@
 #define	SIZE_MASK	((1 << SIZE_BITS) - 1)
 #define	SIZE_LAST	(SIZE_MASK + 1)
 
+/* ----------------------------------------------------------------- */
+
 void * lzjbstream_size_encode(void *out, size_t out_max, size_t size)
 {
 	uint8_t	*put = out, * const put_end  = put + out_max;
 
 	while(put < put_end)
 	{
-		const uint8_t	here = size & 0x7f;
+		const uint8_t	here = size & SIZE_MASK;
 		size >>= SIZE_BITS;
 		if(size == 0)
 		{
@@ -52,3 +54,6 @@ const void * lzjbstream_size_decode(const void *in, size_t in_max, size_t *size)
 	}
 	return NULL;
 }
+
+/* ----------------------------------------------------------------- */
+
