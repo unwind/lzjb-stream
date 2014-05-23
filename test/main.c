@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 		char			buf[8];
 		const size_t	size = rand();
 
-		void *encode_end = lzjbstream_size_encode(buf, sizeof buf, size);
+		void * const encode_end = lzjbstream_size_encode(buf, sizeof buf, size);
 		if(encode_end == NULL)
 		{
 			printf("Failed to encode %zu, out of buffer space\n", size);
@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 		}
 		const size_t encoded_length = (char *) encode_end - buf;
 		size_t size_out;
-		const void *decode_end = lzjbstream_size_decode(buf, encoded_length, &size_out);
+		const void * const decode_end = lzjbstream_size_decode(buf, encoded_length, &size_out);
 		if(decode_end == NULL)
 		{
 			printf("Failed to decode %zu from %zu bytes of encoded data, ran out of input\n", size, encoded_length);

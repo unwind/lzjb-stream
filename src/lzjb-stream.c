@@ -2,6 +2,7 @@
  *
 */
 
+#include <stdio.h>
 #include <stdint.h>
 
 #include "lzjb-stream.h"
@@ -33,25 +34,21 @@ void * lzjbstream_size_encode(void *out, size_t out_max, size_t size)
 const void * lzjbstream_size_decode(const void *in, size_t in_max, size_t *size)
 {
 	const uint8_t	*get = in, * const get_end = get + in_max;
-	size_t			tmp = 0;
+	size_t			tmp = 0, mult = 1;
 
 	while(get < get_end)
 	{
 		const uint8_t	here = *get++;
 
-		tmp <<= SIZE_BITS;
 		if(here & SIZE_LAST)
 		{
-			tmp |= here & SIZE_MASK;
-			break;
+			tmp |= mult * (here & SIZE_MASK);
+			if(size != NULL)
+				*size = tmp;
+			return get;
 		}
-		tmp |= here;
-	}
-	if(get < get_end)
-	{
-		if(size != NULL)
-			*size = tmp;
-		return get;
+		tmp |= mult * here;
+		mult <<= SIZE_BITS;
 	}
 	return NULL;
 }
