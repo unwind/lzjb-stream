@@ -57,3 +57,16 @@ const void * lzjbstream_size_decode(const void *in, size_t in_max, size_t *size)
 
 /* ----------------------------------------------------------------- */
 
+bool lzjbstream_init(LZJBStream *stream, size_t dst_size, void *buf, size_t buf_size)
+{
+	if(stream == NULL || buf == NULL || buf_size < 1)
+		return false;
+
+	stream->buf = buf;
+	stream->buf_pos = 0;
+	stream->buf_size = buf_size;
+	stream->dst_pos = 0;
+	stream->dst_size = dst_size;
+
+	return true;
+}

@@ -2,13 +2,17 @@
  *
 */
 
+#include <stdbool.h>
 #include <stdlib.h>
 
 /* ----------------------------------------------------------------- */
 
 typedef struct {
-	void	*src;
-	size_t	src_size;
+	void	*buf;
+	size_t	buf_pos;
+	size_t	buf_size;
+	size_t	dst_pos;
+	size_t	dst_size;
 } LZJBStream;
 
 /* ----------------------------------------------------------------- */
@@ -40,37 +44,18 @@ const void * lzjbstream_size_decode(const void *in, size_t in_max, size_t *size)
 
 /* ----------------------------------------------------------------- */
 
-/** @brief Initializes a stream for full streaming of both compressed and uncompressed data.
- *
- * After this call, the working buffer is assumed to be empty.
+/** @brief Initializes a stream for "full" streaming of both compressed and uncompressed data.
  *
  * @param stream	The stream to initialize.
  * @param dst_size	Number of destination (uncompressed) bytes that are going to be generated.
- * @param buf		Working buffer where compressed data will be held.
- * @param buf_size	Size of the working buffer.
 */
-int lzjbstream_init(LZJBStream *stream, size_t dst_size, void *buf, size_t buf_size);
+bool lzjbstream_init(LZJBStream *stream, size_t dst_size);
 
 
-/** @brief Initializes a stream for reading, assuming all the compressed data is already available.
- *
- * Use @ref lzjbstream_read() to read uncompressed data from the stream.
- *
- * @param stream	The stream to initialize.
- * @param dst_size	Number of destination (uncompressed) bytes that are going to be generated.
- * @param src		Pointer the compressed data.
- * @param src_size	Number of bytes of compressed data.
-*/
-int lzjbstream_init_static(LZJBStream *stream, size_t dst_size, const void *src, size_t src_size);
-
-
-int lzjbstream_buffer(LZJBStream *stream, const void *data, size_t data_size);
-
-
-/** @brief Read (decompress) data from the stream.
+/** @brief Decompress a stream of data.
  *
  * @param stream	The stream to read from.
- * @param buf		Buffer tor read into, will be filled with decompressed data.
+ * @param buf		Buffer to read into, will be filled with decompressed data.
  * @param buf_size	Maximum number of bytes that @ref buf will hold.
 */
 int lzjbstream_read(LZJBStream *stream, void *buf, size_t buf_max);
