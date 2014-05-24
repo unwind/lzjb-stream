@@ -13,6 +13,12 @@
 #define	SIZE_MASK	((1 << SIZE_BITS) - 1)
 #define	SIZE_LAST	(SIZE_MASK + 1)
 
+typedef enum {
+	State_Empty = 0,
+
+	State__Count
+} State;
+
 /* ----------------------------------------------------------------- */
 
 void * lzjbstream_size_encode(void *out, size_t out_max, size_t size)
@@ -57,14 +63,11 @@ const void * lzjbstream_size_decode(const void *in, size_t in_max, size_t *size)
 
 /* ----------------------------------------------------------------- */
 
-bool lzjbstream_init(LZJBStream *stream, size_t dst_size, void *buf, size_t buf_size)
+bool lzjbstream_init(LZJBStream *stream, size_t dst_size)
 {
-	if(stream == NULL || buf == NULL || buf_size < 1)
+	if(stream == NULL || dst_size < 1)
 		return false;
 
-	stream->buf = buf;
-	stream->buf_pos = 0;
-	stream->buf_size = buf_size;
 	stream->dst_pos = 0;
 	stream->dst_size = dst_size;
 

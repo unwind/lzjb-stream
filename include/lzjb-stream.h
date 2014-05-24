@@ -7,20 +7,23 @@
 
 /* ----------------------------------------------------------------- */
 
+/** @brief The LZJB stream decompressor's state.
+ *
+ * This structure has no public fields: it is declared in public only to
+ * support automatic allocations. Do *not* peekery-poke this struct.
+*/
 typedef struct {
-	void	*buf;
-	size_t	buf_pos;
-	size_t	buf_size;
 	size_t	dst_pos;
 	size_t	dst_size;
 } LZJBStream;
 
 /* ----------------------------------------------------------------- */
 
-/** @brief Encodes a size using a variable-length 7-bit format.
+/** @brief Encodes a size using a variable-length format.
  *
  * The encoded format is endian-invariant, i.e. it will work the same
- * on all architectures.
+ * on all architectures. Being variable length, small sizes will encode
+ * to fewer bytes.
  *
  * @param out		Buffer into which the encoded size will be written.
  * @param out_max	Maximum number of bytes available at @ref out.
@@ -58,4 +61,4 @@ bool lzjbstream_init(LZJBStream *stream, size_t dst_size);
  * @param buf		Buffer to read into, will be filled with decompressed data.
  * @param buf_size	Maximum number of bytes that @ref buf will hold.
 */
-int lzjbstream_read(LZJBStream *stream, void *buf, size_t buf_max);
+size_t lzjbstream_decompress(LZJBStream *stream, const void *src, size_t src_size, void *buf, size_t buf_max);
