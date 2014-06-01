@@ -63,13 +63,30 @@ const void * lzjbstream_size_decode(const void *in, size_t in_max, size_t *size)
 
 /* ----------------------------------------------------------------- */
 
-bool lzjbstream_init(LZJBStream *stream, size_t dst_size)
+static size_t memory_read(size_t offset, void *out, size_t num_bytes, void *user)
 {
-	if(stream == NULL || dst_size < 1)
-		return false;
+}
 
+static size_t memory_write(size_t offset, const void *out, size_t num_bytes, void *user)
+{
+}
+
+bool lzjbstream_init_memory(LZJBStream *stream, void *dst, size_t dst_size);
+{
+	return lzjbstream_init_file(stream, dst_size, memory_read, memory_write, dst);
+}
+
+/* ----------------------------------------------------------------- */
+
+bool lzjbstream_init_file(LZJBStream *stream, size_t dst_size, LZJBStreamRead reader, LZJBStreamWrite writer, void *user)
+{
+	if(stream == NULL || dst_size < 1 || reader == NULL || writer == NULL)
+		return false;
 	stream->dst_pos = 0;
 	stream->dst_size = dst_size;
+	stream->reader = reader;
+	stream->writer = writer;
+	stream->user = user;
 
 	return true;
 }

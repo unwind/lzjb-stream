@@ -7,19 +7,21 @@
 
 /* ----------------------------------------------------------------- */
 
+typedef size_t	(*LZJBStreamRead)(size_t offset, void *out, size_t num_bytes, void *user);
+typedef size_t	(*LZJBStreamWrite)(size_t offset, const void *out, size_t num_bytes, void *user);
+
 /** @brief The LZJB stream decompressor's state.
  *
  * This structure has no public fields: it is declared in public only to
  * support automatic allocations. Do *not* peekery-poke this struct.
 */
 typedef struct {
-	size_t	dst_pos;
-	size_t	dst_size;
+	size_t		dst_pos;
+	size_t		dst_size;
+	LZJBStreamRead	reader;
+	LZJBStreamWrite	writer;
+	void		*user;
 } LZJBStream;
-
-typedef size_t	(*LZJBStreamRead)(size_t offset, void *out, size_t num_bytes, void *user);
-
-typedef size_t	(*LZJBStreamWrite)(size_t offset, const void *out, size_t num_bytes, void *user);
 
 /* ----------------------------------------------------------------- */
 
@@ -66,12 +68,13 @@ bool lzjbstream_init_memory(LZJBStream *stream, void *dst, size_t dst_size);
 /** @brief Initializes a stream for "file" streaming, in which the I/O is deferred to user-supplied callbacks.
  *
  * @param stream	The stream to initialize.
+ * @param dst_size	Number of uncompressed bytes we're going to generate.
  * @param reader	A user function to read *from the already-decompressed data*.
  * @param writer	A user function to write newly decompressed data to the destination.
  *
  * @return @c true on success, @c false on error (one or more parameter had an invalid value).
 */
-bool lzjbstream_init_file(LZJBStream *stream, LZJBStreamRead reader, LZJBStreamWrite writer, void *user);
+bool lzjbstream_init_file(LZJBStream *stream, size_t dst_size, LZJBStreamRead reader, LZJBStreamWrite writer, void *user);
 
 
 /** @brief Decompress a stream of data.
