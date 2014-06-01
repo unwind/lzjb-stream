@@ -65,10 +65,12 @@ const void * lzjbstream_size_decode(const void *in, size_t in_max, size_t *size)
 
 static size_t memory_read(size_t offset, void *out, size_t num_bytes, void *user)
 {
+	memcpy((uint8_t *) user + offset, out, num_bytes);
 }
 
 static size_t memory_write(size_t offset, const void *out, size_t num_bytes, void *user)
 {
+	memcpy((uint8_t *) user + offset, out, num_bytes);
 }
 
 bool lzjbstream_init_memory(LZJBStream *stream, void *dst, size_t dst_size);
