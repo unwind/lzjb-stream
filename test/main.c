@@ -133,12 +133,8 @@ static void test_decompress(void)
 	for(size_t i = 0; i < sizeof data; ++i)
 	{
 		const uint8_t	tmp = data[i];	/* Decompress ultra-slowly, feeding only a single byte at a time. */
-		const size_t used = lzjbstream_decompress(&stream, &tmp, 1);
-		if(used != 1)
-		{
-			printf("Call at %zu used %zu bytes\n", i, used);
+		if(!lzjbstream_decompress(&stream, &tmp, 1))
 			break;
-		}
 	}
 	const size_t len2 = strlen(tmp2);
 	if(len2 == test_original_len && strcmp(tmp2, test_original) == 0)
@@ -149,13 +145,14 @@ static void test_decompress(void)
 	/* Third, decompress a random amount of bytes at a time. */
 	lzjbstream_init_memory(&stream, tmp3, test_original_len);
 	size_t pos = 0;
-	while(!lzjbstream_is_finished(&stream))
+	bool busy = true;
+	while(busy)
 	{
 		int chunk = (rand() % 19 + 1);
 		if(pos + chunk > sizeof data)
 			chunk = sizeof data - pos;
-		const size_t used = lzjbstream_decompress(&stream, data + pos, chunk);
-		pos += used;
+		busy = lzjbstream_decompress(&stream, data + pos, chunk);
+		pos += chunk;
 	}
 	const size_t len3 = strlen(tmp3);
 	if(len3 == test_original_len && strcmp(tmp3, test_original) == 0)

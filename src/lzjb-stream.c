@@ -129,15 +129,14 @@ static void do_copy(LZJBStream *stream, uint8_t get0, uint8_t get1)
 	}
 }
 
-size_t lzjbstream_decompress(LZJBStream *stream, const void *src, size_t src_size)
+bool lzjbstream_decompress(LZJBStream *stream, const void *src, size_t src_size)
 {
 	const uint8_t	*get = src, * const get_end = get + src_size;
 
 	if(stream == NULL || src == NULL || src_size == 0)
-		return 0;
-
+		return false;
 	if(stream->dst_pos >= stream->dst_size)
-		return 0;
+		return false;
 
 	/* If a previous call failed to do a copy due to lack of data, complete it now that we have at least 1 more byte. */
 	if(stream->copy_now)
@@ -185,5 +184,5 @@ size_t lzjbstream_decompress(LZJBStream *stream, const void *src, size_t src_siz
 		}
 		stream->copyshift = 1;
 	}
-	return get - (const uint8_t *) src;
+	return stream->dst_pos < stream->dst_size;
 }

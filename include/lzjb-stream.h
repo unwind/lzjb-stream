@@ -94,11 +94,11 @@ bool lzjbstream_is_finished(const LZJBStream *stream);
 
 /** @brief Decompress a stream of data.
  *
- * @param stream	The stream to read from.
+ * @param stream	The stream to decompress.
  * @param src		Compressed bytes to decompress.
- * @param src_size	Number of compressed bytes available at @ref src.
+ * @param src_size	Number of compressed bytes available at @ref src. All of the provided bytes will always
+ *			be fully consumed by this call.
  *
- * @return The number of compressed bytes at @ref src that were processed. If this value is less than
- * @ref src_size, the remainder must be kept in the buffer and included in a later call to @ref lzjbstream_decompress().
+ * @return @c true if another call is needed, @c false if the requested number of output bytes has been generated.
 */
-size_t lzjbstream_decompress(LZJBStream *stream, const void *src, size_t src_size);
+bool lzjbstream_decompress(LZJBStream *stream, const void *src, size_t src_size);
