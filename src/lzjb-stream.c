@@ -96,7 +96,7 @@ bool lzjbstream_init_file(LZJBStream *stream, size_t dst_size, LZJBStreamGetC fi
 
 	stream->copymask = 0;
 	stream->copyshift = 0;
-	stream->copy_now = false;
+	stream->copynow = false;
 
 	return true;
 }
@@ -139,11 +139,11 @@ bool lzjbstream_decompress(LZJBStream *stream, const void *src, size_t src_size)
 		return false;
 
 	/* If a previous call failed to do a copy due to lack of data, complete it now that we have at least 1 more byte. */
-	if(stream->copy_now)
+	if(stream->copynow)
 	{
-		do_copy(stream, stream->copy_first, get[0]);
+		do_copy(stream, stream->copy0, get[0]);
 		++get;
-		stream->copy_now = false;
+		stream->copynow = false;
 		stream->copyshift = 1;
 	}
 
@@ -171,8 +171,8 @@ bool lzjbstream_decompress(LZJBStream *stream, const void *src, size_t src_size)
 			else
 			{
 //				printf(" deferring copy, insufficient input bytes\n");
-				stream->copy_first = *get++;
-				stream->copy_now = true;
+				stream->copy0 = *get++;
+				stream->copynow = true;
 				stream->copyshift = 0;
 				break;		/* Exit, finish this next time. */
 			}

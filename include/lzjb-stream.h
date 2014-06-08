@@ -8,7 +8,10 @@
 
 /* ----------------------------------------------------------------- */
 
+/** @brief Function pointer for a reading function, which reads already-decompressed bytes back. */
 typedef uint8_t	(*LZJBStreamGetC)(size_t offset, void *user);
+
+/** @brief Function pointer for a writing function, used to store newly-generated decompressed bytes. */
 typedef void	(*LZJBStreamPutC)(size_t offset, uint8_t byte, void *user);
 
 /** @brief The LZJB stream decompressor's state.
@@ -26,8 +29,8 @@ typedef struct {
 	uint8_t		copymask;
 	uint8_t		copymap;
 	uint8_t		copyshift;
-	bool		copy_now;
-	uint8_t		copy_first;
+	uint8_t		copy0;
+	bool		copynow;
 } LZJBStream;
 
 /* ----------------------------------------------------------------- */
