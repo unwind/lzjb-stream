@@ -3,6 +3,7 @@
 */
 
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 /* ----------------------------------------------------------------- */
@@ -21,6 +22,12 @@ typedef struct {
 	LZJBStreamRead	reader;
 	LZJBStreamWrite	writer;
 	void		*user;
+
+	uint8_t		copymask;
+	uint8_t		copymap;
+	uint8_t		copyshift;
+	bool		copy_now;
+	uint8_t		copy_first;
 } LZJBStream;
 
 /* ----------------------------------------------------------------- */
