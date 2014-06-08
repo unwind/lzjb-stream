@@ -1,6 +1,8 @@
-/** @mainpage lzjb-stream
+/** @file lzjb-stream.h
+ * 
+ * @mainpage lzjb-stream
  *
- * @file lzjb-stream.h
+ * @tableofcontents
  *
 */
 
@@ -23,8 +25,9 @@ typedef void	(*LZJBStreamPutC)(size_t offset, uint8_t byte, void *user);
  *
  * This structure has no public fields: it is declared in public only to
  * support automatic allocations. Do *not* peekery-poke this struct.
+ *
 */
-typedef struct {
+typedef struct {	/**  @cond INTERNAL */
 	size_t		dst_pos;
 	size_t		dst_size;
 	LZJBStreamGetC	f_getc;
@@ -35,7 +38,7 @@ typedef struct {
 	uint8_t		copymap;
 	uint8_t		copyshift;
 	uint8_t		copy0;
-	bool		copynow;
+	bool		copynow;	/** @endcond INTERNAL */
 } LZJBStream;
 
 /* ----------------------------------------------------------------- */
