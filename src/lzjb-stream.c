@@ -103,6 +103,15 @@ bool lzjbstream_init_file(LZJBStream *stream, size_t dst_size, LZJBStreamGetC fi
 
 /* ----------------------------------------------------------------- */
 
+bool lzjbstream_is_finished(const LZJBStream *stream)
+{
+	if(stream != NULL)
+		return stream->dst_pos >= stream->dst_size;
+	return false;
+}
+
+/* ----------------------------------------------------------------- */
+
 /* Execute a copy, which is when new output bytes are "created" by re-using existing ones. */
 static void do_copy(LZJBStream *stream, uint8_t get0, uint8_t get1)
 {
@@ -110,12 +119,12 @@ static void do_copy(LZJBStream *stream, uint8_t get0, uint8_t get1)
 	const int offset = ((get0 << BITS_PER_BYTE) | get1) & OFFSET_MASK;
 	size_t copy_from = stream->dst_pos - offset;
 
-	printf(" doing a %d-byte copy from offset %d\n", mlen, offset);
+//	printf(" doing a %d-byte copy from offset %d\n", mlen, offset);
 
 	for(; mlen > 0; --mlen)
 	{
 		const uint8_t tmp = stream->f_getc(copy_from++, stream->user);
-		printf("  copying %x ('%c')\n", tmp, tmp);
+//		printf("  copying %x ('%c')\n", tmp, tmp);
 		stream->f_putc(stream->dst_pos++, tmp, stream->user);
 	}
 }
@@ -141,15 +150,15 @@ size_t lzjbstream_decompress(LZJBStream *stream, const void *src, size_t src_siz
 
 	while(get < get_end)
 	{
-		printf("%zu bytes of input left: copymap=0x%02x, copymask=0x%02x, shift=%u, copy_now=%s\n",
-			get_end - get, stream->copymap, stream->copymask, stream->copyshift, stream->copy_now ? "true" : "false");
+//		printf("%zu bytes of input left: copymap=0x%02x, copymask=0x%02x, shift=%u, copy_now=%s\n",
+//			get_end - get, stream->copymap, stream->copymask, stream->copyshift, stream->copy_now ? "true" : "false");
 		stream->copymask <<= stream->copyshift;
 		if(stream->copymask == 0)
 		{
 			stream->copymap = *get++;
 			stream->copymask = 1;
 			stream->copyshift = 0;
-			printf("loaded copymap 0x%02x\n", stream->copymap);
+//			printf("loaded copymap 0x%02x\n", stream->copymap);
 		}
 		if(get >= get_end)
 			break;
@@ -162,7 +171,7 @@ size_t lzjbstream_decompress(LZJBStream *stream, const void *src, size_t src_siz
 			}
 			else
 			{
-				printf(" deferring copy, insufficient input bytes\n");
+//				printf(" deferring copy, insufficient input bytes\n");
 				stream->copy_first = *get++;
 				stream->copy_now = true;
 				stream->copyshift = 0;
@@ -171,7 +180,7 @@ size_t lzjbstream_decompress(LZJBStream *stream, const void *src, size_t src_siz
 		}
 		else
 		{
-			printf("doing 1-byte write to %zu: 0x%02x\n", stream->dst_pos, *get);
+//			printf("doing 1-byte write to %zu: 0x%02x\n", stream->dst_pos, *get);
 			stream->f_putc(stream->dst_pos++, *get++, stream->user);
 		}
 		stream->copyshift = 1;

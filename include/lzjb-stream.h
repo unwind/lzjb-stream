@@ -82,6 +82,16 @@ bool lzjbstream_init_memory(LZJBStream *stream, void *dst, size_t dst_size);
 bool lzjbstream_init_file(LZJBStream *stream, size_t dst_size, LZJBStreamGetC file_getc, LZJBStreamPutC file_putc, void *user);
 
 
+/** @brief Answers whether a given stream has finished decompressing.
+ *
+ * @param stream	The stream to query.
+ *
+ * @return @c true if the stream is finished, which means that the required number of destintion (output) bytes has been
+ * generated. If we're not there yet, @c false is returned.
+*/
+bool lzjbstream_is_finished(const LZJBStream *stream);
+
+
 /** @brief Decompress a stream of data.
  *
  * @param stream	The stream to read from.
