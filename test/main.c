@@ -8,11 +8,15 @@
 
 #include "lzjb-stream.h"
 
+/* ----------------------------------------------------------------- */
+
 static struct {
 	size_t	count;		/* Number of tests we've done. */
 	size_t	pass_count;
 	char	fail[256];
 } test_state;
+
+/* ----------------------------------------------------------------- */
 
 static void test_passed(void)
 {
@@ -27,7 +31,10 @@ static void test_failed(const char *fmt, ...)
 	va_start(args, fmt);
 	vsnprintf(test_state.fail, sizeof test_state.fail, fmt, args);
 	va_end(args);
+	fprintf(stderr, "**%s\n", test_state.fail);
 }
+
+/* ----------------------------------------------------------------- */
 
 /* Load the given file. Doesn't just use mmap() because reasons. */
 static void * load_file(const char *filename, size_t *length)
@@ -62,6 +69,8 @@ static void * load_file(const char *filename, size_t *length)
 	return buf;
 }
 
+/* ----------------------------------------------------------------- */
+
 static void test_size(size_t size)
 {
 	char	buf[32];
@@ -88,6 +97,8 @@ static void test_size(size_t size)
 	test_passed();
 }
 
+/* ----------------------------------------------------------------- */
+
 static void test_decompress(void)
 {
 	/* Here's one I made earlier. */
@@ -103,17 +114,22 @@ static void test_decompress(void)
 		0x63, 0x6f, 0x6d, 0x0, 0x70, 0x72, 0x65, 0x73, 0x73, 0x27, 0x2c, 0x20, 0x0, 0x27, 0x65, 0x6e, 0x63,
 		0x6f, 0x64, 0x65, 0x5f, 0x0, 0x73, 0x69, 0x7a, 0x65, 0x27, 0x5d
 	};
-	const size_t data_uncompressed_len = 215;
-	uint8_t tmp1[1024] = { 0 }, tmp2[1024] = { 0 };
+	const char test_original[] = "['LEMPEL_SIZE', 'MATCH_BITS', 'MATCH_MAX', 'MATCH_MIN', 'MATCH_RANGE', 'NBBY', 'OFFSET_MASK', '__builtins__', '__doc__', '__file__', '__name__', '__package__', 'compress', 'decode_size', 'decompress', 'encode_size']";
+	const size_t test_original_len = strlen(test_original);
+	uint8_t tmp1[sizeof test_original] = { 0 }, tmp2[sizeof test_original] = { 0 }, tmp3[sizeof test_original] = { 0 };
 	LZJBStream stream;
 
 	/* First, decompress all at once. */
-	lzjbstream_init_memory(&stream, tmp1, data_uncompressed_len);
+	lzjbstream_init_memory(&stream, tmp1, test_original_len);
 	lzjbstream_decompress(&stream, data, sizeof data);
 	const size_t len1 = strlen(tmp1);
+	if(len1 == test_original_len && strcmp(tmp1, test_original) == 0)
+		test_passed();
+	else
+		test_failed("Failed full-file streaming decompression, resulting len=%zu (expected %zu)", len1, sizeof test_original);
 
 	/* Second, decompress a single byte (!) at a time. Mean. */
-	lzjbstream_init_memory(&stream, tmp2, data_uncompressed_len);
+	lzjbstream_init_memory(&stream, tmp2, test_original_len);
 	for(size_t i = 0; i < sizeof data; ++i)
 	{
 		const uint8_t	tmp = data[i];	/* Decompress ultra-slowly, feeding only a single byte at a time. */
@@ -121,14 +137,32 @@ static void test_decompress(void)
 		if(used != 1)
 		{
 			printf("Call at %zu used %zu bytes\n", i, used);
+			break;
 		}
 	}
 	const size_t len2 = strlen(tmp2);
-	if(len1 == data_uncompressed_len && len2 == data_uncompressed_len)
+	if(len2 == test_original_len && strcmp(tmp2, test_original) == 0)
+		test_passed();
+	else
+		test_failed("Failed 1-byte streaming decompression, resulting len=%zu (expected %zu)", len2, sizeof test_original);
+
+	/* Third, decompress a random amount of bytes at a time. */
+	lzjbstream_init_memory(&stream, tmp3, test_original_len);
+	size_t pos = 0;
+	while(!lzjbstream_is_finished(&stream))
 	{
-		if(memcmp(tmp1, tmp2, len1) == 0)
-			printf("OK!\n");
+		int chunk = (rand() % 19 + 1);
+		if(pos + chunk > sizeof data)
+			chunk = sizeof data - pos;
+		const size_t used = lzjbstream_decompress(&stream, data + pos, chunk);
+		pos += used;
 	}
+	const size_t len3 = strlen(tmp3);
+	if(len3 == test_original_len && strcmp(tmp3, test_original) == 0)
+		test_passed();
+	else
+		test_failed("Failed random-chunked streaming decompression, resulting len=%zu (expected %zu)", len3, sizeof test_original);
+
 }
 
 int main(int argc, char *argv[])
@@ -144,6 +178,8 @@ int main(int argc, char *argv[])
 	{
 		test_size(rand());
 	}
+
+	printf("Testing lzjb-stream's decompression API ...\n");
 	test_decompress();
 
 	printf("%zu/%zu tests passed\n", test_state.pass_count, test_state.count);
