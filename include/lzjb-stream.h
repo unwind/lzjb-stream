@@ -38,8 +38,8 @@ typedef struct {
 /** @brief Encodes a size using a variable-length format.
  *
  * The encoded format is endian-invariant, i.e. it will work the same
- * on all architectures. Being variable length, small sizes will encode
- * to fewer bytes.
+ * on all architectures. Since it is variable-length, small sizes will
+ * use fewer bytes when encoded.
  *
  * @param out		Buffer into which the encoded size will be written.
  * @param out_max	Maximum number of bytes available at @ref out.
@@ -79,6 +79,11 @@ bool lzjbstream_init_memory(LZJBStream *stream, void *dst, size_t dst_size);
  *
  * @param stream	The stream to initialize.
  * @param dst_size	Number of uncompressed bytes we're going to generate.
+ * @param file_getc	A pointer to a function that is used to *read back* one of the previously decompressed
+ *			bytes. Note that this is *not* used to read in new compressed bytes; you are supposed
+ *			to that between calls to @c lzjbstream_decompress().
+ * @param file_putc	A pointer to a function that is used to write out a decompressed byte. Decompressed bytes
+ *			will always be written in sequence, without gaps or jumps.
  *
  * @return @c true on success, @c false on error (one or more parameter had an invalid value).
 */
