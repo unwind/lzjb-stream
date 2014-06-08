@@ -181,5 +181,7 @@ int main(int argc, char *argv[])
 
 	printf("%zu/%zu tests passed\n", test_state.pass_count, test_state.count);
 
+	printf("By the way, the stream itself is %zu bytes\n", sizeof (LZJBStream));
+
 	return EXIT_SUCCESS;
 }

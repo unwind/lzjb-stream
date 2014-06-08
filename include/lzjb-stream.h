@@ -1,6 +1,11 @@
-/*
+/** @mainpage lzjb-stream
+ *
+ * @file lzjb-stream.h
  *
 */
+
+#if !defined LZJBSTREAM_H_
+#define	LZJBSTREAM_H_
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -42,9 +47,9 @@ typedef struct {
  * use fewer bytes when encoded.
  *
  * @param out		Buffer into which the encoded size will be written.
- * @param out_max	Maximum number of bytes available at @ref out.
+ * @param out_max	Maximum number of bytes available at out.
  * @param size		The size to encode.
- * @return Pointer to first byte in @ref out after the encoded size.
+ * @return Pointer to first byte in out after the encoded size.
  * If the given @c size doesn't fit in the buffer, the encoding fails
  * and returns @c NULL.
 */
@@ -57,7 +62,7 @@ void * lzjbstream_size_encode(void *out, size_t out_max, size_t size);
  * @param in_max	Maximum number of bytes available to read.
  * @param size		Pointer to location where the final size will be stored.
  *
- * @return Pointer to first byte in @ref in after the encoded size.
+ * @return Pointer to first byte after the encoded size, in the input buffer.
 */
 const void * lzjbstream_size_decode(const void *in, size_t in_max, size_t *size);
 
@@ -76,6 +81,8 @@ bool lzjbstream_init_memory(LZJBStream *stream, void *dst, size_t dst_size);
 
 
 /** @brief Initializes a stream for "file" streaming, in which the I/O is deferred to user-supplied callbacks.
+ * There is no built-in assumption that this reads or writes directly to any actual file, but the design
+ * resembles standard I/O.
  *
  * @param stream	The stream to initialize.
  * @param dst_size	Number of uncompressed bytes we're going to generate.
@@ -84,6 +91,7 @@ bool lzjbstream_init_memory(LZJBStream *stream, void *dst, size_t dst_size);
  *			to that between calls to @c lzjbstream_decompress().
  * @param file_putc	A pointer to a function that is used to write out a decompressed byte. Decompressed bytes
  *			will always be written in sequence, without gaps or jumps.
+ * @param user		User-provided data pointer, which is passed to @c file_getc() and @c file_putc().
  *
  * @return @c true on success, @c false on error (one or more parameter had an invalid value).
 */
@@ -104,9 +112,11 @@ bool lzjbstream_is_finished(const LZJBStream *stream);
  *
  * @param stream	The stream to decompress.
  * @param src		Compressed bytes to decompress.
- * @param src_size	Number of compressed bytes available at @ref src. All of the provided bytes will always
+ * @param src_size	Number of compressed bytes available at src. All of the provided bytes will always
  *			be fully consumed by this call.
  *
  * @return @c true if another call is needed, @c false if the requested number of output bytes has been generated.
 */
 bool lzjbstream_decompress(LZJBStream *stream, const void *src, size_t src_size);
+
+#endif		/* LZJBSTREAM_H_ */
