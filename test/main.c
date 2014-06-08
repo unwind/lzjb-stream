@@ -103,13 +103,17 @@ static void test_decompress(void)
 		0x63, 0x6f, 0x6d, 0x0, 0x70, 0x72, 0x65, 0x73, 0x73, 0x27, 0x2c, 0x20, 0x0, 0x27, 0x65, 0x6e, 0x63,
 		0x6f, 0x64, 0x65, 0x5f, 0x0, 0x73, 0x69, 0x7a, 0x65, 0x27, 0x5d
 	};
-	uint8_t tmp[1024] = { 0 };
+	const size_t data_uncompressed_len = 215;
+	uint8_t tmp1[1024] = { 0 }, tmp2[1024] = { 0 };
 	LZJBStream stream;
 
-	lzjbstream_init_memory(&stream, tmp, 215);
-#if 0
+	/* First, decompress all at once. */
+	lzjbstream_init_memory(&stream, tmp1, data_uncompressed_len);
 	lzjbstream_decompress(&stream, data, sizeof data);
-#else
+	const size_t len1 = strlen(tmp1);
+
+	/* Second, decompress a single byte (!) at a time. Mean. */
+	lzjbstream_init_memory(&stream, tmp2, data_uncompressed_len);
 	for(size_t i = 0; i < sizeof data; ++i)
 	{
 		const uint8_t	tmp = data[i];	/* Decompress ultra-slowly, feeding only a single byte at a time. */
@@ -119,8 +123,12 @@ static void test_decompress(void)
 			printf("Call at %zu used %zu bytes\n", i, used);
 		}
 	}
-#endif
-	printf("Got: '%s'\n", tmp);
+	const size_t len2 = strlen(tmp2);
+	if(len1 == data_uncompressed_len && len2 == data_uncompressed_len)
+	{
+		if(memcmp(tmp1, tmp2, len1) == 0)
+			printf("OK!\n");
+	}
 }
 
 int main(int argc, char *argv[])
