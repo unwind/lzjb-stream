@@ -66,32 +66,32 @@ const void * lzjbstream_size_decode(const void *in, size_t in_max, size_t *size)
 
 /* ----------------------------------------------------------------- */
 
-static size_t memory_read(size_t offset, void *out, size_t num_bytes, void *user)
+static uint8_t memory_getc(size_t offset, void *user)
 {
-	memcpy(out, (uint8_t *) user + offset, num_bytes);
+	return ((uint8_t *) user)[offset];
 }
 
-static size_t memory_write(size_t offset, const void *out, size_t num_bytes, void *user)
+static void memory_putc(size_t offset, uint8_t byte, void *user)
 {
-	memcpy((uint8_t *) user + offset, out, num_bytes);
+	((uint8_t *) user)[offset] = byte;
 }
 
 bool lzjbstream_init_memory(LZJBStream *stream, void *dst, size_t dst_size)
 {
-	return lzjbstream_init_file(stream, dst_size, memory_read, memory_write, dst);
+	return lzjbstream_init_file(stream, dst_size, memory_getc, memory_putc, dst);
 }
 
 /* ----------------------------------------------------------------- */
 
-bool lzjbstream_init_file(LZJBStream *stream, size_t dst_size, LZJBStreamRead reader, LZJBStreamWrite writer, void *user)
+bool lzjbstream_init_file(LZJBStream *stream, size_t dst_size, LZJBStreamGetC file_getc, LZJBStreamPutC file_putc, void *user)
 {
-	if(stream == NULL || dst_size < 1 || reader == NULL || writer == NULL)
+	if(stream == NULL || dst_size < 1 || getc == NULL || putc == NULL)
 		return false;
 
 	stream->dst_pos = 0;
 	stream->dst_size = dst_size;
-	stream->reader = reader;
-	stream->writer = writer;
+	stream->f_getc = file_getc;
+	stream->f_putc = file_putc;
 	stream->user = user;
 
 	stream->copymask = 0;
@@ -112,14 +112,11 @@ static void do_copy(LZJBStream *stream, uint8_t get0, uint8_t get1)
 
 	printf(" doing a %d-byte copy from offset %d\n", mlen, offset);
 
-	/* This is horrible. */
-	for(; mlen > 0; --mlen, ++copy_from, ++stream->dst_pos)
+	for(; mlen > 0; --mlen)
 	{
-		uint8_t tmp;
-
-		stream->reader(copy_from, &tmp, 1, stream->user);
+		const uint8_t tmp = stream->f_getc(copy_from++, stream->user);
 		printf("  copying %x ('%c')\n", tmp, tmp);
-		stream->writer(stream->dst_pos, &tmp, 1, stream->user);
+		stream->f_putc(stream->dst_pos++, tmp, stream->user);
 	}
 }
 
@@ -175,9 +172,7 @@ size_t lzjbstream_decompress(LZJBStream *stream, const void *src, size_t src_siz
 		else
 		{
 			printf("doing 1-byte write to %zu: 0x%02x\n", stream->dst_pos, *get);
-			stream->writer(stream->dst_pos, get, 1, stream->user);
-			++stream->dst_pos;
-			++get;
+			stream->f_putc(stream->dst_pos++, *get++, stream->user);
 		}
 		stream->copyshift = 1;
 	}
