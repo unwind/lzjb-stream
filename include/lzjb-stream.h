@@ -2,14 +2,63 @@
  * 
  * @mainpage lzjb-stream
  *
- * @tableofcontents
+ * This is lzjb-stream, a small library that supports streaming decompression of [LZJB-compressed](http://en.wikipedia.org/wiki/LZJB) data.
+ * The library has very small memory requirements, basically on the order of 30 bytes or so.
+ * The idea is that even small embedded systems shall be able to decompress LZJB data using this code.
+ *
+ * The name "stream" refers to the fact that the library does not assume that all compressed data is available when decompression starts.
+ * Instead, you can feed the library any number of compressed bytes and it will decompress as much as possible.
+ * You can feed it as little as a single byte at a time, or as much as the entire compressed file.
+ *
+ * ## Integration ##
+ * The lzjb-stream library is written in platform-independent C.
+ * It very sparingly uses C99 features, mainly the @c bool datatype.
+ * If your compiler does not support C99, use the @ref lzjb-stream-config.h macros to work around it.
+ *
+ * ## Size encoding ##
+ * The library provides convenience functions to encode and decode sizes (i.e. values of type `size_t`).
+ * Please see @ref lzjbstream_size_encode() for the encoding function, and @ref lzjbstream_size_decode() for the decoder.
+ *
+ * ## Decompression ##
+ * Decompressing data is done using the helper data structure @ref LZJBStream, which holds the state of the stream.
+ * You can initialize and use any number of such streams, there is no additional memory overhead for each stream.
+ *
+ * Depending on your application's environment and requirements, you can use either memory-oriented or file-oriented streaming.
+ * The two modes differ in how the streaming library writes its output (the decompressed data) and also how it re-reads such data.
+ * Re-reading of already decompressed data is a crucial operation since the compression is achieved by back-referencing repeating data.
+ *
+ * @note The library does not assume any header in the compressed data, in particular you *must* know the size of the
+ *       decompressed data from the beginning.
+ *
+ * <dl>
+ * <dt>Memory-oriented streaming</dt>
+ * <dd>
+ * In memory-oriented streaming, the entire input (compressed data) is assumed to be available when the decompression runs.
+ * To set up a memory-oriented stream, use @ref lzjbstream_init_memory().
+ * </dd>
+ *
+ * <dt>File-oriented streaming</dt>
+ * <dd>
+ * In file-oriented streaming, writing output and reading already-written output is deferred to user-supplied functions.
+ * To set up a file-oriented stream, use @ref lzjbstream_init_file().
+ * </dd>
+ * </dl>
+ *
+ * Once a stream has been initialized, all the application has to do is feed it compressed data to uncompress.
+ * This is done using the @ref lzjbstream_decompress() function, which returns @c false when decompression is done.
+ * You can also query a stream for completeness using the @ref lzjbstream_is_finished() function.
  *
 */
 
 #if !defined LZJBSTREAM_H_
 #define	LZJBSTREAM_H_
 
+#include "lzjb-stream-config.h"
+
+#if defined LZJBSTREAM_WITH_STDBOOL
 #include <stdbool.h>
+#endif
+
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -86,6 +135,9 @@ bool lzjbstream_init_memory(LZJBStream *stream, void *dst, size_t dst_size);
 /** @brief Initializes a stream for "file" streaming, in which the I/O is deferred to user-supplied callbacks.
  * There is no built-in assumption that this reads or writes directly to any actual file, but the design
  * resembles standard I/O.
+ *
+ * Since the LZJB compressed format is very byte-oriented, the I/O functions read and write single bytes.
+ * It is assumed that maximum performance is not the goal of using this library.
  *
  * @param stream	The stream to initialize.
  * @param dst_size	Number of uncompressed bytes we're going to generate.

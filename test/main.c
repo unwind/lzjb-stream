@@ -118,6 +118,7 @@ static void test_decompress(void)
 	const size_t test_original_len = strlen(test_original);
 	uint8_t tmp1[sizeof test_original] = { 0 }, tmp2[sizeof test_original] = { 0 }, tmp3[sizeof test_original] = { 0 };
 	LZJBStream stream;
+	size_t i;
 
 	/* First, decompress all at once. */
 	lzjbstream_init_memory(&stream, tmp1, test_original_len);
@@ -130,7 +131,7 @@ static void test_decompress(void)
 
 	/* Second, decompress a single byte (!) at a time. Mean. */
 	lzjbstream_init_memory(&stream, tmp2, test_original_len);
-	for(size_t i = 0; i < sizeof data; ++i)
+	for(i = 0; i < sizeof data; ++i)
 	{
 		const uint8_t	tmp = data[i];	/* Decompress ultra-slowly, feeding only a single byte at a time. */
 		if(!lzjbstream_decompress(&stream, &tmp, 1))
@@ -164,14 +165,16 @@ static void test_decompress(void)
 
 int main(int argc, char *argv[])
 {
+	size_t	i;
+
 	printf("Testing lzjb-stream's size codec API ...\n");
 	/* Hard-coded edge cases. */
 	test_size(0);
 	test_size(~(size_t) 0);
 	/* A single walking 1-bit. */
-	for(size_t i = 1; i != 0; i <<= 1)
+	for(i = 1; i != 0; i <<= 1)
 		test_size(i);
-	for(size_t i = 0; i < 1000000; ++i)
+	for(i = 0; i < 1000000; ++i)
 	{
 		test_size(rand());
 	}
