@@ -12,8 +12,7 @@
  *
  * ## Integration ##
  * The lzjb-stream library is written in platform-independent C.
- * It very sparingly uses C99 features, mainly the @c bool datatype.
- * If your compiler does not support C99, use the @ref lzjb-stream-config.h macros to work around it.
+ * It uses the @c bool datatype from C99; if your compiler does not support C99, see @ref lzjb-stream-config.h for a way to provide your own boolean type.
  *
  * ## Size encoding ##
  * The library provides convenience functions to encode and decode sizes (i.e. values of type `size_t`).
