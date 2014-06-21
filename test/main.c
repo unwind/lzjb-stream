@@ -1,5 +1,7 @@
 /*
+ * Test program for lzjb-stream library, by Emil Brink.
  *
+ * This file is in the public domain.
 */
 
 #include <stdarg.h>

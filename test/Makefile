@@ -1,6 +1,8 @@
 #
 # Makefile for lzjb-stream's test code.
 #
+# This file is in the public domain.
+#
 
 CFLAGS	= -std=c99 -I ../include
 
