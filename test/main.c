@@ -7,6 +7,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/time.h>
 
 #include "lzjb-stream.h"
 
@@ -101,6 +102,38 @@ static void test_size(size_t size)
 
 /* ----------------------------------------------------------------- */
 
+static uint8_t p_getc(size_t offset, void *user)
+{
+	return ((uint8_t *) user)[offset];
+}
+
+static void p_putc(size_t offset, uint8_t byte, void *user)
+{
+	((uint8_t *) user)[offset] = byte;
+}
+
+static void test_performance(void)
+{
+	size_t	clen;
+	void *dat = load_file("performance-data.lzjb", &clen);
+	LZJBStream pstream;
+	int i;
+	const size_t out_len = 16950115;
+	void *out = malloc(out_len);
+	struct timeval t0, t1;
+
+	printf("Loaded %zu bytes\n", clen);
+	gettimeofday(&t0, NULL);
+	for(i = 0; i < 10; ++i)
+	{
+		lzjbstream_init_file(&pstream, out_len, p_getc, p_putc, out);
+		lzjbstream_decompress(&pstream, dat, clen);
+	}
+	gettimeofday(&t1, NULL);
+	free(out);
+	printf("Wrote %zu bytes in %.1g seconds\n", i * out_len, 0.);
+}
+
 static void test_decompress(void)
 {
 	/* Here's one I made earlier. */
@@ -162,7 +195,6 @@ static void test_decompress(void)
 		test_passed();
 	else
 		test_failed("Failed random-chunked streaming decompression, resulting len=%zu (expected %zu)", len3, sizeof test_original);
-
 }
 
 int main(int argc, char *argv[])
@@ -183,6 +215,9 @@ int main(int argc, char *argv[])
 
 	printf("Testing lzjb-stream's decompression API ...\n");
 	test_decompress();
+
+	printf("Testing performance ...\n");
+	test_performance();
 
 	printf("%zu/%zu tests passed\n", test_state.pass_count, test_state.count);
 

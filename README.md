@@ -9,6 +9,11 @@ Feature overview:
 - Accepts any number of compressed data bytes at a time.
 
 
+## Performance ##
+The library is not optimized for performance, but for low memory overhead.
+In its general mode, it does a function call per generated output byte, which of course is costly.
+
+
 ## API Documentation ##
 The API is annotated in the source using industry-standard [Doxygen](http://www.stack.nl/~dimitri/doxygen/) comments.
 After you've cloned the project, run these commands to generate the documentation:
