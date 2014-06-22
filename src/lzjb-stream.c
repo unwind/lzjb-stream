@@ -1,6 +1,6 @@
 /** @file lzjb-stream.c
 */
-/*
+/* lzjb-stream.c
  *
  * Copyright (c) 2014, Emil Brink
  * All rights reserved.

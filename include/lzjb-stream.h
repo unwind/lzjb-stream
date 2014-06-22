@@ -48,7 +48,7 @@
  * You can also query a stream for completeness using the @ref lzjbstream_is_finished() function.
  *
 */
-/*
+/* lzjb-stream.h
  *
  * Copyright (c) 2014, Emil Brink
  * All rights reserved.
