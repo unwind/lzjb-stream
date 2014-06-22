@@ -114,24 +114,29 @@ static void p_putc(size_t offset, uint8_t byte, void *user)
 
 static void test_performance(void)
 {
-	size_t	clen;
-	void *dat = load_file("performance-data.lzjb", &clen);
-	LZJBStream pstream;
-	int i;
-	const size_t out_len = 16950115;
-	void *out = malloc(out_len);
+	size_t		clen;
+	void 		*dat = load_file("performance-data.lzjb", &clen), *out;
+	const void	*cdat;
+	LZJBStream 	pstream;
+	int		i;
+	size_t		out_len;
+	double		elapsed;
 	struct timeval t0, t1;
 
-	printf("Loaded %zu bytes\n", clen);
+	cdat = lzjbstream_size_decode(dat, clen, &out_len);
+	out = malloc(out_len);
+	printf(" Loaded %zu bytes, decompressing ...\n", clen);
 	gettimeofday(&t0, NULL);
-	for(i = 0; i < 10; ++i)
+	for(i = 0; i < 50; ++i)
 	{
 		lzjbstream_init_file(&pstream, out_len, p_getc, p_putc, out);
-		lzjbstream_decompress(&pstream, dat, clen);
+		lzjbstream_decompress(&pstream, cdat, clen);
 	}
 	gettimeofday(&t1, NULL);
 	free(out);
-	printf("Wrote %zu bytes in %.1g seconds\n", i * out_len, 0.);
+	elapsed = t1.tv_sec - t0.tv_sec + 1e-6 * (t1.tv_usec - t0.tv_usec);
+	printf(" Wrote %zu bytes in %.1f seconds => %.1f MB/s\n", i * out_len, elapsed,
+		(i * out_len) / (elapsed * 1024. * 1024.));
 }
 
 static void test_decompress(void)
@@ -216,10 +221,10 @@ int main(int argc, char *argv[])
 	printf("Testing lzjb-stream's decompression API ...\n");
 	test_decompress();
 
+	printf("%zu/%zu tests passed\n", test_state.pass_count, test_state.count);
+
 	printf("Testing performance ...\n");
 	test_performance();
-
-	printf("%zu/%zu tests passed\n", test_state.pass_count, test_state.count);
 
 	printf("By the way, the stream itself is %zu bytes\n", sizeof (LZJBStream));
 
