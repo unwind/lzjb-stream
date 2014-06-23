@@ -1,6 +1,6 @@
 # lzjb-stream #
 This is a streaming [LZJB](http://en.wikipedia.org/wiki/LZJB) decompressor.
-"Streaming" means that it supports decompressing while reading: all of the input does not have to be be available at the same time.
+"Streaming" means that it supports decompressing while reading: all of the input does not have to be be available in order to decompress.
 
 Feature overview:
 
@@ -15,9 +15,19 @@ This is open source software, and licensed under the [BSD 2-clause license](http
 Thus, lzjb-stream can be used in commercial software as long as the copyright notice is respected.
 
 
+## Integrating ##
+Add lzjb-stream to your own project by including these three files:
+
+- lzjb-stream.c - Main library implementation file.
+- lzjb-stream.h - Header declaring the public interface (functions and data structures).
+- lzjb-stream-config.h - Application-specific configuration. Edit this if using C89.
+
+
 ## Performance ##
-The library is not optimized for performance, but for low memory overhead and simple code.
-In its general mode, it does a function call per generated output byte, which of course is costly.
+The library is not optimized for performance, but for low memory overhead and internal simplicity.
+The targeted niche, basically embedded systems maintenance, is not one where performance is critical.
+
+In general, it does a function call per generated output byte, which of course is costly.
 On the author's semi-ancient Core2 Q6600/2.4 GHz, it manages ~40 MB/s decompression speed.
 
 
