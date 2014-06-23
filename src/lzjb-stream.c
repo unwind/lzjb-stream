@@ -137,7 +137,9 @@ bool lzjbstream_is_finished(const LZJBStream *stream)
 
 /* ----------------------------------------------------------------- */
 
-/* Execute a copy, which is when new output bytes are "created" by re-using existing ones. */
+/* Execute a copy, which is when new output bytes are "created" by re-using existing ones.
+ * Note: this generates new output by copying *old* output: no new input bytes are needed!
+*/
 static void do_copy(LZJBStream *stream, uint8_t get0, uint8_t get1)
 {
 	int mlen = (get0 >> (BITS_PER_BYTE - MATCH_BITS)) + MATCH_MIN;
