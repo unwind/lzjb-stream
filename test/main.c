@@ -112,10 +112,10 @@ static void p_putc(size_t offset, uint8_t byte, void *user)
 	((uint8_t *) user)[offset] = byte;
 }
 
-static void test_performance(void)
+static void test_performance(const char *filename)
 {
 	size_t		clen;
-	void 		*dat = load_file("performance-data.lzjb", &clen), *out;
+	void 		*dat, *out;
 	const void	*cdat;
 	LZJBStream 	pstream;
 	int		i;
@@ -123,6 +123,12 @@ static void test_performance(void)
 	double		elapsed;
 	struct timeval t0, t1;
 
+	dat = load_file(filename, &clen);
+	if(dat == NULL)
+	{
+		printf("Couldn't open performance testing input file '%s', skipping\n", filename);
+		return;
+	}
 	cdat = lzjbstream_size_decode(dat, clen, &out_len);
 	out = malloc(out_len);
 	printf(" Loaded %zu bytes, decompressing ...\n", clen);
@@ -224,7 +230,7 @@ int main(int argc, char *argv[])
 	printf("%zu/%zu tests passed\n", test_state.pass_count, test_state.count);
 
 	printf("Testing performance ...\n");
-	test_performance();
+	test_performance("performance-data.lzjb");
 
 	printf("By the way, the stream itself is %zu bytes\n", sizeof (LZJBStream));
 
