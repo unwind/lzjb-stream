@@ -2,7 +2,9 @@
 # Simplistic Makefile for lzjb-stream. Mainly concerned with dist-archiving.
 #
 
-.PHONY:	sdist
+.PHONY:	doc help sdist
+
+ALL:	help
 
 VERSION	= $(shell grep LZJBSTREAM_VERSION include/lzjb-stream.h | cut -d'"' -f2)
 
@@ -13,6 +15,15 @@ LICENSE	= LICENSE
 DIST	= $(SRC) $(INC) $(DOC) $(LICENSE)
 
 # ----------------------------------------------------------------------
+
+doc:
+	cd doc && make
+
+help:
+	@echo "Available make targets:"
+	@echo "- doc    Builds the Doxygen HTML documentation, requires Doxygen."
+	@echo "- sdist  Builds a trivial source distribution archive.\n"
+	@echo "There is no general library target, copy the source files to your project instead!"
 
 sdist:	Makefile $(DIST)
 	tar czf lzjb-stream-$(VERSION).tar.gz  $(DIST)

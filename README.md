@@ -22,10 +22,12 @@ Add lzjb-stream to your own project by including these three files:
 - lzjb-stream.h - Header declaring the public interface (functions and data structures).
 - lzjb-stream-config.h - Application-specific configuration. Edit this if using C89.
 
+At the moment, lzjb-stream is not designed to build to a standalone library file, the intention is that the code should be included in your project.
+
 
 ## Performance ##
 The library is not optimized for performance, but for low memory overhead and internal simplicity.
-The targeted niche, basically embedded systems maintenance, is not one where performance is critical.
+The targeted niche, basically embedded systems maintenance, is not one where performance is super-critical.
 
 In general, it does a function call per generated output byte, which of course is costly.
 On the author's semi-ancient Core2 Q6600/2.4 GHz, it manages ~40 MB/s decompression speed.
