@@ -42,4 +42,4 @@ After you've cloned the project, run these commands to generate the documentatio
 
 Then point your browser at the resulting `doc/html/index.html` file.
 
-In the meantime, if you're not bothered by the Doxygen markup, you can of course [read the header itself]().
+In the meantime, if you're not bothered by the Doxygen markup, you can of course [read the header itself](https://github.com/unwind/lzjb-stream/blob/master/include/lzjb-stream.h).
