@@ -55,11 +55,11 @@ void * lzjbstream_size_encode(void *out, size_t out_max, size_t size)
 
 	while(put < put_end)
 	{
-		const uint8_t	here = size & SIZE_MASK;
+		const uint8_t	here = (uint8_t) (size & SIZE_MASK);
 		size >>= SIZE_BITS;
 		if(size == 0)
 		{
-			*put++ = SIZE_LAST | here;
+			*put++ = (uint8_t) (SIZE_LAST | here);
 			return put;
 		}
 		*put++ = here;
@@ -211,5 +211,5 @@ bool lzjbstream_decompress(LZJBStream *stream, const void *src, size_t src_size)
 		}
 		stream->copyshift = 1;
 	}
-	return stream->dst_pos < stream->dst_size;
+	return (stream->dst_pos < stream->dst_size) ? true : false;
 }
