@@ -51,7 +51,7 @@
 
 void * lzjbstream_size_encode(void *out, size_t out_max, size_t size)
 {
-	uint8_t	*put = out, * const put_end  = put + out_max;
+	uint8_t	*put = out, * const put_end = put + out_max;
 
 	while(put < put_end)
 	{
