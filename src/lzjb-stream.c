@@ -142,9 +142,9 @@ bool lzjbstream_is_finished(const LZJBStream *stream)
 */
 static void do_copy(LZJBStream *stream, uint8_t get0, uint8_t get1)
 {
-	int mlen = (get0 >> (BITS_PER_BYTE - MATCH_BITS)) + MATCH_MIN;
-	const int offset = ((get0 << BITS_PER_BYTE) | get1) & OFFSET_MASK;
+	const unsigned int offset = (((unsigned int) get0 << BITS_PER_BYTE) | get1) & OFFSET_MASK;
 	size_t copy_from = stream->dst_pos - offset;
+	int mlen = (get0 >> (BITS_PER_BYTE - MATCH_BITS)) + MATCH_MIN;
 
 /*	printf(" doing a %d-byte copy from offset %d\n", mlen, offset);*/
 
