@@ -110,7 +110,7 @@ bool lzjbstream_init_memory(LZJBStream *stream, void *dst, size_t dst_size)
 
 bool lzjbstream_init_file(LZJBStream *stream, size_t dst_size, LZJBStreamGetC file_getc, LZJBStreamPutC file_putc, void *user)
 {
-	if(stream == NULL || dst_size < 1 || getc == NULL || putc == NULL)
+	if(stream == NULL || dst_size < 1 || file_getc == NULL || file_putc == NULL)
 		return false;
 
 	stream->dst_pos = 0;
