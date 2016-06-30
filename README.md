@@ -7,7 +7,7 @@ Feature overview:
 - Very low memory overhead: ~30 bytes when 32-bit, ~50 bytes when 64-bit.
 - Does not do any heap allocations.
 - Accepts any number of compressed data bytes at a time, down to single bytes.
-- Written in portable C, builds as either C89 and C99.
+- Written in portable C, builds as both C89 and C99.
 
 
 ## Licensing ##
