@@ -2,7 +2,7 @@
 */
 /* lzjb-stream.c
  *
- * Copyright (c) 2014, Emil Brink
+ * Copyright (c) 2014-2016, Emil Brink
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -70,7 +70,7 @@ void * lzjbstream_size_encode(void *out, size_t out_max, size_t size)
 const void * lzjbstream_size_decode(const void *in, size_t in_max, size_t *size)
 {
 	const uint8_t	*get = in, * const get_end = get + in_max;
-	size_t			tmp = 0, mult = 1;
+	size_t		tmp = 0, mult = 1;
 
 	while(get < get_end)
 	{
