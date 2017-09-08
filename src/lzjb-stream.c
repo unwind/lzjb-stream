@@ -43,9 +43,7 @@
 
 #define	MATCH_BITS	6
 #define	MATCH_MIN	3
-#define	MATCH_MAX	((1 << MATCH_BITS) + (MATCH_MIN - 1))
 #define	OFFSET_MASK	((1 << (16 - MATCH_BITS)) - 1)
-#define	LEMPEL_SIZE	1024
 
 /* ----------------------------------------------------------------- */
 
@@ -93,7 +91,8 @@ const void * lzjbstream_size_decode(const void *in, size_t in_max, size_t *size)
 
 static uint8_t memory_getc(size_t offset, void *user)
 {
-	return ((uint8_t *) user)[offset];
+	(void) user;	// This makes linters happier.
+	return ((const uint8_t *) user)[offset];
 }
 
 static void memory_putc(size_t offset, uint8_t byte, void *user)
@@ -176,9 +175,8 @@ bool lzjbstream_decompress(LZJBStream *stream, const void *src, size_t src_size)
 
 	while(get < get_end)
 	{
-/*		printf("%zu bytes of input left: copymap=0x%02x, copymask=0x%02x, shift=%u, copy_now=%s\n",
-			get_end - get, stream->copymap, stream->copymask, stream->copyshift, stream->copy_now ? "true" : "false");
-*/		stream->copymask <<= stream->copyshift;
+/*		printf("%zu bytes of input left: copymap=0x%02x, copymask=0x%02x, shift=%u, copy_now=%s\n", get_end - get, stream->copymap, stream->copymask, stream->copyshift, stream->copy_now ? "true" : "false"); */
+		stream->copymask = (uint8_t) ((unsigned int) stream->copymask << stream->copyshift);
 		if(stream->copymask == 0)
 		{
 			stream->copymap = *get++;
