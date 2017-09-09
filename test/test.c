@@ -162,7 +162,7 @@ static void test_decompress(void)
 	};
 	const char test_original[] = "['LEMPEL_SIZE', 'MATCH_BITS', 'MATCH_MAX', 'MATCH_MIN', 'MATCH_RANGE', 'NBBY', 'OFFSET_MASK', '__builtins__', '__doc__', '__file__', '__name__', '__package__', 'compress', 'decode_size', 'decompress', 'encode_size']";
 	const size_t test_original_len = strlen(test_original);
-	uint8_t tmp1[sizeof test_original] = { 0 }, tmp2[sizeof test_original] = { 0 }, tmp3[sizeof test_original] = { 0 };
+	char tmp1[sizeof test_original] = { 0 }, tmp2[sizeof test_original] = { 0 }, tmp3[sizeof test_original] = { 0 };
 	LZJBStream stream;
 	size_t i;
 

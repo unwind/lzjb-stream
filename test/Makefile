@@ -12,7 +12,7 @@ ALL:	$(ALL)
 
 # ----------------------------------------------------------------------
 
-CFLAGS	= -std=c99 -I ../include -g
+CFLAGS	= -std=c99 -I ../include -g -Wall
 
 test:	test.c ../src/lzjb-stream.c
 
